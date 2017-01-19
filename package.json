@@ -21,7 +21,6 @@
   },
   "homepage": "https://github.com/dochoaj/react-boilerplate#readme",
   "devDependencies": {
-    "axios": "^0.15.3",
     "babel": "6.3.13",
     "babel-core": "6.1.18",
     "babel-eslint": "7.1.1",
@@ -46,17 +45,11 @@
     "node-sass": "^4.0.0",
     "react": "^15.4.1",
     "react-dom": "^15.4.1",
-    "react-redux": "^5.0.2",
-    "redux": "^3.6.0",
-    "redux-thunk": "^2.2.0",
     "sass-loader": "^4.0.2",
     "style-loader": "^0.13.1",
     "url-loader": "^0.5.7",
     "webpack": "1.12.9",
     "webpack-config": "6.2.1",
     "webpack-dev-server": "^1.16.2"
-  },
-  "dependencies": {
-    "axios": "^0.15.3"
   }
 }
