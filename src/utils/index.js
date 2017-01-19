@@ -1,0 +1,1 @@
+export PokemonAxios from './PokemonAxios'

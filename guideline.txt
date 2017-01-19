@@ -1,0 +1,175 @@
+1. Install redux, react-redux and redux-thunk
+
+2. On index.js: Import pro
+
+import { Provider } from 'react-redux'
+import { createStore } from 'redux'
+
+3. On reducers.js: Add the markup for reducers
+
+import { combineReducers } from 'redux'
+
+const reducers = combineReducers({})
+
+export default reducers
+
+4. On index.js: Creating store
+
+import reducers from './reducers'
+
+const store = createStore(reducers)
+
+5. Add middleware to createStore
+
+import thunk from 'redux-thunk'
+
+modify import { createStore } from 'redux' to import { createStore, applyMiddleware } from 'redux'
+
+modify const store = createStore(reducers) to const store = createStore(reducers, applyMiddleware(thunk))
+
+6. Add Provider to Main component
+
+render(
+  <Provider store={store}>
+    <App />
+  </Provider>,
+  document.getElementById('root')
+)
+
+7. Show PokeAPI and talk about component separation. Build modules directory and list directory
+
+8. Create modules/list/index.js
+
+9. Create utils/index.js and utils/PokemonAxios.js with the following:
+
+- PokemonAxios.js
+
+import Axios from 'axios'
+
+export default Axios.create({
+  baseURL: 'http://pokeapi.co/api/v2',
+  timeout: 25000,
+})
+
+- index.js
+
+export PokemonAxios from './PokemonAxios'
+
+9. Add the following code to modules/list/actions.js
+
+import { PokemonAxios } from '../../utils'
+
+export const FETCH_POKEMON_LIST = 'FETCH_POKEMON_LIST'
+export const LOADING_POKEMON_LIST = 'LOADING_POKEMON_LIST'
+
+export function fetchPokemonList() {
+  return dispatch => {
+    dispatch({ type: LOADING_POKEMON_LIST, payload: true })
+
+    PokemonAxios.get('/pokemon')
+      .then(response => {
+        dispatch({ type: FETCH_POKEMON_LIST, payload: response.data })
+      })
+  }
+}
+
+10. Add the following to modules/list/index.js
+
+export {
+  FETCH_POKEMON_LIST,
+  LOADING_POKEMON_LIST,
+  fetchPokemonList,
+} from './actions'
+
+11. Create modules/list/reducer.js
+
+12. Add the following to modules/list/reducer.js
+
+import {
+  FETCH_POKEMON_LIST,
+} from './actions'
+
+const initialState = {
+  data: {},
+  loading: true,
+}
+
+export default function (state = initialState, action) {
+  switch (action.type) {
+    case FETCH_POKEMON_LIST:
+      return { ...state, data: action.payload, loading: false }
+    default:
+      return state
+  }
+}
+
+13. Export reducer from list/index.js
+
+export default from './reducer'
+
+13. Import the reducer into reducers.js
+
+const reducers = combineReducers({
+  list: PokemonListReducer
+})
+
+14. Build the container, create the modules/list/Container.js file with the following
+
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
+import { fetchPokemonList } from '../list'
+
+import View from './View'
+
+function mapStateToProps(state) {
+  return {
+    results: state.list.data.results,
+    loading: state.list.loading,
+  }
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    fetchPokemonList: bindActionCreators(fetchPokemonList, dispatch),
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(View)
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(View)
+
+export default connect(mapStateToProps, mapDispatchToProps)(View)
+
+15. Export container from list/index.js
+
+export Container from './Container'
+
+15. Build  the View, create the modules/list/View.js with the following
+
+import React, { Component } from 'react'
+
+class View extends Component {
+  componentDidMount() {
+    this.props.fetchPokemonList()
+  }
+
+  render() {
+    console.log(this.props.results)
+    console.log(this.props.loading)
+
+    return (
+      <h1>We all live in a pokemon world!</h1>
+    )
+  }
+}
+
+View.propTypes = {
+  results: React.PropTypes.obj,
+  loading: React.PropTypes.bool,
+  fetchPokemonList: React.PropTypes.func,
+}
+
+export default View
+
+16. 
