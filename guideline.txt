@@ -344,7 +344,7 @@ export default function (state = initialState, action) {
   }
 }
 
-27. Add reducer to index
+27. Add reducer to reducers.js
 
 28. Create Container component with the following
 
@@ -356,8 +356,8 @@ import View from './View'
 
 function mapStateToProps(state) {
   return {
-    results: state.list.data.results,
-    loading: state.list.loading,
+    pokemon: state.card.data,
+    loading: state.card.loading,
   }
 }
 
@@ -368,7 +368,6 @@ function mapDispatchToProps(dispatch) {
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(View)
-
 
 29. Export container from index
 
@@ -407,7 +406,7 @@ export default(
   <Route path="/" component={App}>
     <IndexRoute component={PokemonList} />
     <Route path="pokemons" component={PokemonList} />
-    <Route path="pokemon/:id" component={PokemonCard} />
+    <Route path="pokemon/:number" component={PokemonCard} />
   </Route>
 )
 
@@ -440,3 +439,222 @@ render() {
   console.log(this.props.loading)
   return this.buildContent()
 }
+
+35. Create View with the following content
+
+import React, { Component } from 'react'
+import PokemonCard from './PokemonCard'
+
+class View extends Component {
+  componentDidMount() {
+    this.props.fetchPokemon(this.props.params.number)
+  }
+
+  buildContent() {
+    if (this.props.loading) {
+      return <h1>Loading ...</h1>
+    }
+
+    return (
+      <PokemonCard {...this.props.pokemon}/>
+    )
+  }
+
+  render() {
+    return this.buildContent()
+  }
+}
+
+View.propTypes = {
+  params: React.PropTypes.shape({
+    number: React.PropTypes.string,
+  }),
+  pokemon: React.PropTypes.shape({
+    sprites: React.PropTypes.shape({
+      front_default: React.PropTypes.string,
+    }),
+    name: React.PropTypes.string,
+    weight: React.PropTypes.number,
+    height: React.PropTypes.number,
+    types: React.PropTypes.arrayOf(React.PropTypes.object),
+  }),
+  loading: React.PropTypes.bool,
+  fetchPokemon: React.PropTypes.func,
+}
+
+export default View
+
+36. Create PokemonCard component with the following code:
+
+import React, { Component } from 'react'
+import { Link } from 'react-router'
+
+import './PokemonCard.scss'
+
+class PokemonCard extends Component {
+  buildTypes() {
+    return this.props.types.map((typeItem) => {
+      const key = typeItem.slot
+      const name = typeItem.type.name
+
+      return (
+        <div
+          className="pokemon-type"
+          key={key}
+          >
+          {name}
+        </div>
+      )
+    })
+  }
+
+  render() {
+    return (
+      <div className="pokemon-card">
+        <div className="pokemon-title">
+          <div className="pokemon-image">
+            <img
+              className="img img-circle"
+              src={this.props.sprites.front_default}
+              alt={this.props.name}
+            />
+          </div>
+          <div className="pokemon-name">
+            {`# ${this.props.id} ${this.props.name}`}
+          </div>
+        </div>
+        <div className="pokemon-data">
+          <div className="pokemon-types">
+            {this.buildTypes()}
+          </div>
+          <div className="pokemon-data-row">
+            <span className="title">Height:</span>
+            <span className="value">{this.props.height / 10} mts.</span>
+          </div>
+          <div className="pokemon-data-row">
+            <span className="title">Width:</span>
+            <span className="value">{this.props.weight / 10} kgs.</span>
+          </div>
+        </div>
+        <Link to="/">
+          Back to list
+        </Link>
+      </div>
+    )
+  }
+}
+
+PokemonCard.propTypes = {
+  id: React.PropTypes.number,
+  sprites: React.PropTypes.shape({
+    front_default: React.PropTypes.string,
+  }),
+  name: React.PropTypes.string,
+  weight: React.PropTypes.number,
+  height: React.PropTypes.number,
+  types: React.PropTypes.arrayOf(React.PropTypes.object),
+}
+
+export default PokemonCard
+
+37. Add pokemon card styles
+
+.pokemon-card {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+
+  .pokemon-title {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+
+    .pokemon-name {
+      display: flex;
+      font-weight: bold;
+      text-transform: uppercase;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+
+  .pokemon-data {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+
+    .pokemon-types {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+
+      .pokemon-type {
+        display: flex;
+        justify-content: center;
+        font-weight: bold;
+        text-transform: capitalize;
+      }
+    }
+
+    .pokemon-data-row {
+      display: flex;
+
+      .title {
+        font-weight: bold;
+      }
+
+      .value {
+        margin-left: 5px;
+      }
+    }
+  }
+}
+
+38. Add styles to App.scss
+
+.pokemon-list-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+39. Add linking to pages
+
+In Row.js
+
+import { Link } from 'react-router'
+
+<td>
+  <Link to={`pokemon/${this.props.pokemon.pokedexNumber}`}>
+    {this.props.pokemon.name}
+  </Link>
+</td>
+
+In PokemonCard.js
+
+import { Link } from 'react-router'
+
+<Link to="/">
+  Back to list
+</Link>
+
+40. Talk about the problem when changing pages. Implement the loading reducer.
+
+In card/actions.js add:
+
+export function triggerLoading() {
+  return dispatch => {
+    dispatch({ type: LOADING_POKEMON, payload: true })
+  }
+}
+
+41. Export triggerLoading on card/index.js
+
+42. Add loading pokemon action to reducer
+
+43. Add triggerLoading on container
+
+44. Call on componentWillMount

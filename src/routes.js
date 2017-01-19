@@ -9,6 +9,6 @@ export default(
   <Route path="/" component={App}>
     <IndexRoute component={PokemonList} />
     <Route path="pokemons" component={PokemonList} />
-    <Route path="pokemon/:id" component={PokemonCard} />
+    <Route path="pokemon/:number" component={PokemonCard} />
   </Route>
 )

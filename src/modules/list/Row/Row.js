@@ -1,11 +1,16 @@
 import React, { Component } from 'react'
+import { Link } from 'react-router'
 
 class Row extends Component {
   render() {
     return (
       <tr>
         <th scope="row">{this.props.pokemon.pokedexNumber}</th>
-        <td>{this.props.pokemon.name}</td>
+        <td>
+          <Link to={`pokemon/${this.props.pokemon.pokedexNumber}`}>
+            {this.props.pokemon.name}
+          </Link>
+        </td>
       </tr>
     )
   }
