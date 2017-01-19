@@ -136,11 +136,6 @@ function mapDispatchToProps(dispatch) {
 
 export default connect(mapStateToProps, mapDispatchToProps)(View)
 
-
-export default connect(mapStateToProps, mapDispatchToProps)(View)
-
-export default connect(mapStateToProps, mapDispatchToProps)(View)
-
 15. Export container from list/index.js
 
 export Container from './Container'
@@ -172,4 +167,276 @@ View.propTypes = {
 
 export default View
 
-16. 
+16. Add the Table component with the following code:
+
+import React, { Component } from 'react'
+
+class Table extends Component {
+  render() {
+    return (
+      <table className="table table-condensed">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    )
+  }
+}
+
+Table.propTypes = {
+  data: React.PropTypes.arrayOf(React.PropTypes.object)
+}
+
+export default Table
+
+17. Create the Row component with the following code:
+
+import React, { Component } from 'react'
+
+class Row extends Component {
+  render() {
+    return (
+      <tr>
+        <th scope="row">{this.props.pokemon.pokedexNumber}</th>
+        <td>{this.props.pokemon.name}</td>
+      </tr>
+    )
+  }
+}
+
+Row.propTypes = {
+  pokemon: React.PropTypes.shape({
+    pokedexNumber: React.PropTypes.string,
+    name: React.PropTypes.string,
+  }),
+}
+
+export default Row
+
+18. Add the row component to the Table component here
+
+import React, { Component } from 'react'
+import Row from '../Row'
+
+class Table extends Component {
+  constructor(props) {
+    super(props)
+
+    this.buildRows = this.buildRows.bind(this)
+  }
+
+  buildRows() {
+    return this.props.data.map((item) => {
+      const pokemon = {
+        name: item.name,
+        pokedexNumber: item.url.match(/\/\d+\//)[0].replace(/\//g, ''),
+      }
+
+      return <Row key={pokemon.name} pokemon={pokemon} />
+    })
+  }
+
+  render() {
+    return (
+      <table className="table table-condensed">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+          </tr>
+        </thead>
+        <tbody>
+          {this.buildRows()}
+        </tbody>
+      </table>
+    )
+  }
+}
+
+Table.propTypes = {
+  data: React.PropTypes.arrayOf(React.PropTypes.object),
+}
+
+export default Table
+
+19. Show the  Cannot read property 'map' of undefined error
+
+20. Use the loading prop to sort the error
+
+After componentDidMount:
+
+  buildContent() {
+    if (this.props.loading) {
+      return (
+        <h2>Loading...</h2>
+      )
+    }
+
+    return (
+      <Table data={this.props.results} />
+    )
+  }
+
+  render() {
+    console.log(this.props.results)
+    console.log(this.props.loading)
+
+    return (
+      <div className="pokedex-container">
+        <h1>We all live in a pokemon world!</h1>
+        {this.buildContent()}
+      </div>
+    )
+  }
+
+21. Install react-router
+
+22. Add pokemon card module. Create card directory with an index.js
+
+23. Add actions.js with the following:
+
+import { PokemonAxios } from '../../utils'
+
+export const FETCH_POKEMON = 'FETCH_POKEMON'
+export const LOADING_POKEMON = 'LOADING_POKEMON'
+
+export function fetchPokemon(id) {
+  return dispatch => {
+    dispatch({ type: LOADING_POKEMON, payload: true })
+
+    PokemonAxios.get(`/pokemon/${id}`)
+      .then(response => {
+        dispatch({ type: FETCH_POKEMON, payload: response.data })
+      })
+  }
+}
+
+25. Add actions and actions creators to index.
+
+export {
+  FETCH_POKEMON,
+  LOADING_POKEMON,
+  fetchPokemon,
+} from './actions'
+
+26. Create reducer.js
+
+import {
+  FETCH_POKEMON,
+} from './actions'
+
+const initialState = {
+  data: {},
+  loading: true,
+}
+
+export default function (state = initialState, action) {
+  switch (action.type) {
+    case FETCH_POKEMON:
+      return { ...state, data: action.payload, loading: false }
+    default:
+      return state
+  }
+}
+
+27. Add reducer to index
+
+28. Create Container component with the following
+
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
+import { fetchPokemon } from '../card'
+
+import View from './View'
+
+function mapStateToProps(state) {
+  return {
+    results: state.list.data.results,
+    loading: state.list.loading,
+  }
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    fetchPokemon: bindActionCreators(fetchPokemon, dispatch),
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(View)
+
+
+29. Export container from index
+
+30. Create card/view with the following
+
+import React, { Component } from 'react'
+
+class View extends Component {
+  render() {
+    return (
+      <h2>This is a pokemon card</h2>
+    )
+  }
+}
+
+export default View
+
+31. Install react-router into app:
+
+- Add import { Router, hashHistory } from 'react-router' into index.js
+- Add import routes from './routes' into index.js
+- Add <Router history={hashHistory} routes={routes} /> into index.js inside Provider
+
+32. Remove import App from './App' from index.js
+
+32. Create routes.js with the following
+
+import React from 'react'
+import { Route, IndexRoute } from 'react-router'
+
+import App from './App'
+import { Container as PokemonList } from './modules/list'
+import { Container as PokemonCard } from './modules/card'
+
+export default(
+  <Route path="/" component={App}>
+    <IndexRoute component={PokemonList} />
+    <Route path="pokemons" component={PokemonList} />
+    <Route path="pokemon/:id" component={PokemonCard} />
+  </Route>
+)
+
+33. Change App/App.js with the following:
+
+import React, { Component } from 'react'
+import './App.scss'
+
+class App extends Component {
+  render() {
+    return (
+      <div className="pokemon-list-container">
+        <h1>We all live in a pokemon world!</h1>
+        {this.props.children}
+      </div>
+    )
+  }
+}
+
+App.propTypes = {
+  children: React.PropTypes.element,
+}
+
+export default App
+
+34.Change render method from list/view and change to:
+
+render() {
+  console.log(this.props.results)
+  console.log(this.props.loading)
+  return this.buildContent()
+}

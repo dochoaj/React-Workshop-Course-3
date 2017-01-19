@@ -1,17 +1,27 @@
 import React, { Component } from 'react'
+import Table from './Table'
 
 class View extends Component {
   componentDidMount() {
     this.props.fetchPokemonList()
   }
 
+  buildContent() {
+    if (this.props.loading) {
+      return (
+        <h2>Loading...</h2>
+      )
+    }
+
+    return (
+      <Table data={this.props.results} />
+    )
+  }
+
   render() {
     console.log(this.props.results)
     console.log(this.props.loading)
-
-    return (
-      <h1>We all live in a pokemon world!</h1>
-    )
+    return this.buildContent()
   }
 }
 
