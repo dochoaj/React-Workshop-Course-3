@@ -1,9 +1,19 @@
 import React, { Component } from 'react'
+import './App.scss'
 
-export default class App extends Component {
+class App extends Component {
   render() {
     return (
-      <h1>We all live in a pokemon world!</h1>
+      <div className="pokemon-list-container">
+        <h1>We all live in a pokemon world!</h1>
+        {this.props.children}
+      </div>
     )
   }
 }
+
+App.propTypes = {
+  children: React.PropTypes.element,
+}
+
+export default App
